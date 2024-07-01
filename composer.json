@@ -1,0 +1,30 @@
+{
+    "name": "level51/silverstripe-image-credits",
+    "version": "0.0.1",
+    "time": "2024-07-01",
+    "description": "Image credits extension for Silverstripe",
+    "keywords": [
+        "silverstripe"
+    ],
+    "type": "silverstripe-vendormodule",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Level51",
+            "email": "hallo@lvl51.de"
+        }
+    ],
+    "require": {
+        "php": ">=8",
+        "silverstripe/framework": "^5.0",
+        "silverstripe/vendor-plugin": "^2"
+    },
+    "minimum-stability": "dev",
+    "autoload": {
+        "psr-4": {
+            "Level51\\ImageCredits\\": [
+                "src"
+            ]
+        }
+    }
+}

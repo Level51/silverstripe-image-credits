@@ -1,0 +1,10 @@
+---
+Name: level51-image-credits
+---
+SilverStripe\Assets\Image:
+  extensions:
+    - Level51\ImageCredits\ImageExtension
+
+SilverStripe\AssetAdmin\Forms\ImageFormFactory:
+  extensions:
+    - Level51\ImageCredits\ImageFormFactoryExtension
