@@ -11,3 +11,8 @@ SilverStripe\AssetAdmin\Forms\ImageFormFactory:
 
 Level51\ImageCredits\ImageExtension:
   force_rebuild: false
+  text_margin: 10
+  box_padding: 10
+  font_size: 30
+  font_color: '#000000'
+  box_background: 'rgba(255, 255, 255, 0.7)'

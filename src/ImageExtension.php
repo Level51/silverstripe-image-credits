@@ -75,18 +75,20 @@ class ImageExtension extends DataExtension
      */
     private function getCreditsSettings(): array
     {
+        $config = Config::forClass(__CLASS__);
+
         // TODO maintainable font (at least provide a few options)?
         $fontPath = realpath(dirname(__DIR__) . '/assets/fonts') . '/arial/ARIAL.TTF';
 
-        // TODO maintainable settings like size, font color, position, box background color...?
+        // TODO maintainable position
 
         return [
-            'textMargin'    => 10,
-            'boxPadding'    => 10,
+            'textMargin'    => $config->get('text_margin'),
+            'boxPadding'    => $config->get('box_padding'),
             'fontPath'      => $fontPath,
-            'fontSize'      => 30,
-            'fontColor'     => '#000000',
-            'boxBackground' => 'rgba(255, 255, 255, 0.7)',
+            'fontSize'      => $config->get('font_size'),
+            'fontColor'     => $config->get('font_color'),
+            'boxBackground' => $config->get('box_background'),
         ];
     }
 
@@ -94,8 +96,9 @@ class ImageExtension extends DataExtension
     {
         $original = $this->owner;
         $credits = $original->Credits;
+        $settings = $this->getCreditsSettings();
 
-        $variantNameParams = [__FUNCTION__, $credits];
+        $variantNameParams = [__FUNCTION__, $credits, md5(implode('::', array_values($settings)))];
 
         // Allow to force image rebuild by adding the current timestamp to the variant name
         if (Config::inst()->get(__CLASS__, 'force_rebuild')) {
@@ -110,14 +113,12 @@ class ImageExtension extends DataExtension
 
         return $this->owner->manipulateImage(
             $variant,
-            function (Image_Backend $backend) use ($credits, $original) {
+            function (Image_Backend $backend) use ($credits, $original, $settings) {
                 if (!($resource = $backend->getImageResource())) {
                     return null;
                 }
 
                 if ($resource instanceof \Intervention\Image\Image) {
-                    $settings = $this->getCreditsSettings();
-
                     $imageWidth = $original->getWidth();
                     $imageHeight = $original->getHeight();
 
