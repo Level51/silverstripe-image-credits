@@ -19,11 +19,24 @@ use SilverStripe\ORM\DataExtension;
  */
 class ImageExtension extends DataExtension
 {
+    public const string POSITION_BOTTOM_LEFT = 'bottom_left';
+    public const string POSITION_BOTTOM_RIGHT = 'bottom_right';
+    public const string POSITION_BOTTOM_CENTER = 'bottom_center';
+
     private static $db = [
         'Credits' => 'Varchar(255)',
     ];
 
-    public function updateCMSFields(FieldList $fields)
+    public static function getPositionOptions(): array
+    {
+        return [
+            self::POSITION_BOTTOM_LEFT   => _t(__CLASS__ . '.BottomLeft', 'Bottom Left'),
+            self::POSITION_BOTTOM_CENTER => _t(__CLASS__ . '.BottomCenter', 'Bottom Center'),
+            self::POSITION_BOTTOM_RIGHT  => _t(__CLASS__ . '.BottomRight', 'Bottom Right'),
+        ];
+    }
+
+    public function updateCMSFields(FieldList $fields): void
     {
         parent::updateCMSFields($fields);
 
@@ -36,7 +49,7 @@ class ImageExtension extends DataExtension
         );
     }
 
-    public function updateFieldLabels(&$labels)
+    public function updateFieldLabels(&$labels): void
     {
         parent::updateFieldLabels($labels);
         $labels['Credits'] = _t(__CLASS__ . '.Credits', 'Credits');
@@ -68,6 +81,17 @@ class ImageExtension extends DataExtension
         ];
     }
 
+    private function getPositionOption(): string
+    {
+        $position = Config::inst()->get(__CLASS__, 'position');
+
+        if (isset(self::getPositionOptions()[$position])) {
+            return $position;
+        }
+
+        return self::POSITION_BOTTOM_RIGHT;
+    }
+
     /**
      * Get all relevant settings used to put the credits on the owner image.
      *
@@ -80,8 +104,6 @@ class ImageExtension extends DataExtension
         // TODO maintainable font (at least provide a few options)?
         $fontPath = realpath(dirname(__DIR__) . '/assets/fonts') . '/arial/ARIAL.TTF';
 
-        // TODO maintainable position
-
         return [
             'textMargin'    => $config->get('text_margin'),
             'boxPadding'    => $config->get('box_padding'),
@@ -89,7 +111,63 @@ class ImageExtension extends DataExtension
             'fontSize'      => $config->get('font_size'),
             'fontColor'     => $config->get('font_color'),
             'boxBackground' => $config->get('box_background'),
+            'position'      => $this->getPositionOption(),
         ];
+    }
+
+    private function getTextPosition($settings, $imageWidth, $imageHeight, $fontBoxSize): array
+    {
+        $y = $imageHeight - $settings['textMargin'];
+        $boxY1 = $y - $fontBoxSize['height'] - $settings['boxPadding'];
+        $boxY2 = $y + $settings['boxPadding'];
+
+        switch ($settings['position']) {
+            case self::POSITION_BOTTOM_LEFT:
+                $x = $settings['textMargin'];
+
+                return [
+                    'x'      => $x,
+                    'y'      => $y,
+                    'align'  => 'left',
+                    'valign' => 'bottom',
+                    'box'    => [
+                        'x1' => $x - $settings['boxPadding'],
+                        'y1' => $boxY1,
+                        'x2' => $x + $fontBoxSize['width'] + $settings['boxPadding'],
+                        'y2' => $boxY2,
+                    ],
+                ];
+            case self::POSITION_BOTTOM_CENTER:
+                $x = $imageWidth / 2;
+
+                return [
+                    'x'      => $x,
+                    'y'      => $y,
+                    'align'  => 'center',
+                    'valign' => 'bottom',
+                    'box'    => [
+                        'x1' => $x - ($fontBoxSize['width'] / 2) - $settings['boxPadding'],
+                        'y1' => $boxY1,
+                        'x2' => $x + ($fontBoxSize['width'] / 2) + $settings['boxPadding'],
+                        'y2' => $boxY2,
+                    ],
+                ];
+            default:
+                $x = $imageWidth - $settings['textMargin'];
+
+                return [
+                    'x'      => $x,
+                    'y'      => $y,
+                    'align'  => 'right',
+                    'valign' => 'bottom',
+                    'box'    => [
+                        'x1' => $x - $fontBoxSize['width'] - $settings['boxPadding'],
+                        'y1' => $boxY1,
+                        'x2' => $x + $settings['boxPadding'],
+                        'y2' => $boxY2,
+                    ],
+                ];
+        }
     }
 
     public function AddCredits(): DBFile|Image|null
@@ -122,25 +200,24 @@ class ImageExtension extends DataExtension
                     $imageWidth = $original->getWidth();
                     $imageHeight = $original->getHeight();
 
-                    $x = $imageWidth - $settings['textMargin'];
-                    $y = $imageHeight - $settings['textMargin'];
+                    $boxSize = $this->getBoxSize($credits, $settings['fontPath'], $settings['fontSize']);
 
-                    $resource->text($credits, $x, $y, function ($font) use ($credits, $resource, $x, $y, $settings) {
+                    $positions = $this->getTextPosition($settings, $imageWidth, $imageHeight, $boxSize);
+
+                    $resource->text($credits, $positions['x'], $positions['y'], function ($font) use ($credits, $resource, $settings, $positions, $boxSize) {
                         /** @var AbstractFont $font */
                         $font->file($settings['fontPath']);
                         $font->size($settings['fontSize']);
-                        $font->align('right');
-                        $font->valign('bottom');
+                        $font->align($positions['align']);
+                        $font->valign($positions['valign']);
                         $font->color($settings['fontColor']);
-
-                        $boxSize = $this->getBoxSize($credits, $settings['fontPath'], $settings['fontSize']);
 
                         if ($boxSize['width'] && $boxSize['height']) {
                             $resource->rectangle(
-                                $x - $boxSize['width'] - $settings['boxPadding'],
-                                $y - $boxSize['height'] - $settings['boxPadding'],
-                                $x + $settings['boxPadding'],
-                                $y + $settings['boxPadding'],
+                                $positions['box']['x1'],
+                                $positions['box']['y1'],
+                                $positions['box']['x2'],
+                                $positions['box']['y2'],
                                 function ($draw) use ($settings) {
                                     $draw->background($settings['boxBackground']);
                                 },
