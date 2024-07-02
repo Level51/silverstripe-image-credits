@@ -8,3 +8,6 @@ SilverStripe\Assets\Image:
 SilverStripe\AssetAdmin\Forms\ImageFormFactory:
   extensions:
     - Level51\ImageCredits\ImageFormFactoryExtension
+
+Level51\ImageCredits\ImageExtension:
+  force_rebuild: false

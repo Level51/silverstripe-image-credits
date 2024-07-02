@@ -7,6 +7,7 @@ use Intervention\Image\Gd\Font as GdFont;
 use SilverStripe\Assets\Image;
 use SilverStripe\Assets\Image_Backend;
 use SilverStripe\Assets\Storage\DBFile;
+use SilverStripe\Core\Config\Config;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\TextField;
 use SilverStripe\ORM\DataExtension;
@@ -93,7 +94,15 @@ class ImageExtension extends DataExtension
     {
         $original = $this->owner;
         $credits = $original->Credits;
-        $variant = $original->variantName(__FUNCTION__, $credits, time());
+
+        $variantNameParams = [__FUNCTION__, $credits];
+
+        // Allow to force image rebuild by adding the current timestamp to the variant name
+        if (Config::inst()->get(__CLASS__, 'force_rebuild')) {
+            $variantNameParams[] = time();
+        }
+
+        $variant = $original->variantName(...$variantNameParams);
 
         if (!$original->exists() || !$original->Credits) {
             return $original;
