@@ -145,11 +145,6 @@ class ImageExtension extends DataExtension
                                 },
                             );
                         }
-
-                        /* Set the content again to work around a bug in intervention/image < v3 (which is still used by Silverstripe)
-                         * @see https://github.com/Intervention/image/issues/1126
-                         */
-                        $font->text($credits);
                     });
                 }
 
