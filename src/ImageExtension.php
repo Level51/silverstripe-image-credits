@@ -23,8 +23,9 @@ class ImageExtension extends DataExtension
     public const string POSITION_BOTTOM_RIGHT = 'bottom_right';
     public const string POSITION_BOTTOM_CENTER = 'bottom_center';
 
-    private static $db = [
-        'Credits' => 'Varchar(255)',
+    private static array $db = [
+        'Credits'         => 'Varchar(255)',
+        'CreditsSettings' => 'Text',
     ];
 
     public static function getPositionOptions(): array
@@ -81,15 +82,30 @@ class ImageExtension extends DataExtension
         ];
     }
 
-    private function getPositionOption(): string
+    private function getPositionOption(array $creditsSettings): string
     {
+        $options = self::getPositionOptions();
+
+        if (isset($creditsSettings['Position']) && isset($options[$creditsSettings['Position']])) {
+            return $creditsSettings['Position'];
+        }
+
         $position = Config::inst()->get(__CLASS__, 'position');
 
-        if (isset(self::getPositionOptions()[$position])) {
+        if (isset($options[$position])) {
             return $position;
         }
 
         return self::POSITION_BOTTOM_RIGHT;
+    }
+
+    private function getParsedCreditsSettings(): ?array
+    {
+        if ($this->owner->CreditsSettings) {
+            return json_decode($this->owner->CreditsSettings, true);
+        }
+
+        return null;
     }
 
     /**
@@ -97,21 +113,22 @@ class ImageExtension extends DataExtension
      *
      * @return array
      */
-    private function getCreditsSettings(): array
+    private function getFinalCreditsSettings(): array
     {
         $config = Config::forClass(__CLASS__);
+        $creditsSettings = $this->getParsedCreditsSettings();
 
         // TODO maintainable font (at least provide a few options)?
         $fontPath = realpath(dirname(__DIR__) . '/assets/fonts') . '/arial/ARIAL.TTF';
 
         return [
-            'textMargin'    => $config->get('text_margin'),
-            'boxPadding'    => $config->get('box_padding'),
+            'textMargin'    => $creditsSettings['TextMargin'] ?? $config->get('text_margin'),
+            'boxPadding'    => $creditsSettings['BoxPadding'] ?? $config->get('box_padding'),
             'fontPath'      => $fontPath,
-            'fontSize'      => $config->get('font_size'),
+            'fontSize'      => $creditsSettings['FontSize'] ?? $config->get('font_size'),
             'fontColor'     => $config->get('font_color'),
             'boxBackground' => $config->get('box_background'),
-            'position'      => $this->getPositionOption(),
+            'position'      => $this->getPositionOption($creditsSettings),
         ];
     }
 
@@ -174,7 +191,7 @@ class ImageExtension extends DataExtension
     {
         $original = $this->owner;
         $credits = $original->Credits;
-        $settings = $this->getCreditsSettings();
+        $settings = $this->getFinalCreditsSettings();
 
         $variantNameParams = [__FUNCTION__, $credits, md5(implode('::', array_values($settings)))];
 
