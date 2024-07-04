@@ -82,11 +82,11 @@ class ImageExtension extends DataExtension
         ];
     }
 
-    private function getPositionOption(array $creditsSettings): string
+    private function getPositionOption(array|null $creditsSettings): string
     {
         $options = self::getPositionOptions();
 
-        if (isset($creditsSettings['Position']) && isset($options[$creditsSettings['Position']])) {
+        if ($creditsSettings && isset($creditsSettings['Position']) && isset($options[$creditsSettings['Position']])) {
             return $creditsSettings['Position'];
         }
 
