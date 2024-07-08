@@ -134,13 +134,13 @@ class ImageExtension extends DataExtension
 
     private function getTextPosition($settings, $imageWidth, $imageHeight, $fontBoxSize): array
     {
-        $y = $imageHeight - $settings['textMargin'];
-        $boxY1 = $y - $fontBoxSize['height'] - $settings['boxPadding'];
-        $boxY2 = $y + $settings['boxPadding'];
+        $y = intval($imageHeight - $settings['textMargin']);
+        $boxY1 = intval($y - $fontBoxSize['height'] - $settings['boxPadding']);
+        $boxY2 = intval($y + $settings['boxPadding']);
 
         switch ($settings['position']) {
             case self::POSITION_BOTTOM_LEFT:
-                $x = $settings['textMargin'];
+                $x = intval($settings['textMargin']);
 
                 return [
                     'x'      => $x,
@@ -148,14 +148,14 @@ class ImageExtension extends DataExtension
                     'align'  => 'left',
                     'valign' => 'bottom',
                     'box'    => [
-                        'x1' => $x - $settings['boxPadding'],
+                        'x1' => intval($x - $settings['boxPadding']),
                         'y1' => $boxY1,
-                        'x2' => $x + $fontBoxSize['width'] + $settings['boxPadding'],
+                        'x2' => intval($x + $fontBoxSize['width'] + $settings['boxPadding']),
                         'y2' => $boxY2,
                     ],
                 ];
             case self::POSITION_BOTTOM_CENTER:
-                $x = $imageWidth / 2;
+                $x = intval($imageWidth / 2);
 
                 return [
                     'x'      => $x,
@@ -163,14 +163,14 @@ class ImageExtension extends DataExtension
                     'align'  => 'center',
                     'valign' => 'bottom',
                     'box'    => [
-                        'x1' => $x - ($fontBoxSize['width'] / 2) - $settings['boxPadding'],
+                        'x1' => intval($x - ($fontBoxSize['width'] / 2) - $settings['boxPadding']),
                         'y1' => $boxY1,
-                        'x2' => $x + ($fontBoxSize['width'] / 2) + $settings['boxPadding'],
+                        'x2' => intval($x + ($fontBoxSize['width'] / 2) + $settings['boxPadding']),
                         'y2' => $boxY2,
                     ],
                 ];
             default:
-                $x = $imageWidth - $settings['textMargin'];
+                $x = intval($imageWidth - $settings['textMargin']);
 
                 return [
                     'x'      => $x,
@@ -178,9 +178,9 @@ class ImageExtension extends DataExtension
                     'align'  => 'right',
                     'valign' => 'bottom',
                     'box'    => [
-                        'x1' => $x - $fontBoxSize['width'] - $settings['boxPadding'],
+                        'x1' => intval($x - $fontBoxSize['width'] - $settings['boxPadding']),
                         'y1' => $boxY1,
-                        'x2' => $x + $settings['boxPadding'],
+                        'x2' => intval($x + $settings['boxPadding']),
                         'y2' => $boxY2,
                     ],
                 ];
