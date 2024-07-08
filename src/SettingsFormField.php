@@ -29,7 +29,7 @@ class SettingsFormField extends CompositeField
                     'Position',
                     _t(__CLASS__ . '.Position', 'Position'),
                     ImageExtension::getPositionOptions(),
-                ),
+                )->setHasEmptyDefault(true),
             ],
         );
 
@@ -65,7 +65,9 @@ class SettingsFormField extends CompositeField
     {
         $data = [];
         foreach ($this->getChildren() as $child) {
-            $data[$child->getName()] = $child->dataValue();
+            if ($child->dataValue()) {
+                $data[$child->getName()] = $child->dataValue();
+            }
         }
 
         return json_encode($data);
