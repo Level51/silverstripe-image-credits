@@ -4,3 +4,9 @@ en:
     BottomLeft: Bottom Left
     BottomRight: Bottom Right
     Credits: Credits
+  Level51\ImageCredits\SettingsFormField:
+    BoxPadding: Background box padding
+    FontSize: Font Size
+    Position: Position
+    TextMargin: Text Margin
+

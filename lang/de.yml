@@ -4,3 +4,8 @@ de:
     BottomLeft: Unten links
     BottomRight: Unten rechts
     Credits: Bildrechte
+  Level51\ImageCredits\SettingsFormField:
+    BoxPadding: Hintergrund Abstand zum Text
+    FontSize: Schriftgröße
+    Position: Position
+    TextMargin: Text Abstand zu den Rändern des Bildes

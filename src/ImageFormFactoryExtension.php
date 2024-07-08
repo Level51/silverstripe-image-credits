@@ -21,17 +21,25 @@ class ImageFormFactoryExtension extends Extension
         $image = $context['Record'] ?? null;
 
         if ($image && $image->appCategory() === 'image') {
-            $creditsField = TextField::create('Credits', _t(ImageExtension::class . '.Credits', 'Credits'));
             $titleField = $fields->fieldByName('Editor.Details.Title');
 
             if ($titleField) {
+                $creditsField = TextField::create('Credits', _t(ImageExtension::class . '.Credits', 'Credits'));
+                $settingsField = SettingsFormField::create('CreditsSettings');
+
                 if ($titleField->isReadonly()) {
                     $creditsField = $creditsField->performReadonlyTransformation();
+                    $settingsField = $settingsField->performReadonlyTransformation();
                 }
 
                 $fields->insertAfter(
                     'Title',
                     $creditsField,
+                );
+
+                $fields->addFieldToTab(
+                    'Editor.CreditsSettings',
+                    $settingsField,
                 );
             }
         }
