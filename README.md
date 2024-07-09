@@ -13,6 +13,23 @@ Level51\ImageCredits\ImageExtension:
   force_rebuild: true
 ```
 
+## Image Credits Page
+There is `$ImageWithCredits` variable globally available in all templates which can be used to render a list of all images with its credits. You can therefore use it in any template, e.g. like this:
+
+```
+<% loop $ImageWithCredits %>
+    <div style="display: flex;">
+        <div style="flex: none; margin-right: 2rem;">
+            $ScaleWidth(200)
+        </div>
+
+        <div style="flex: auto;">
+            $Credits
+        </div>
+    </div>
+<% end_loop %>
+```
+
 ## Requirements
 - SilverStripe ^5.0
 - PHP >= 8.0
