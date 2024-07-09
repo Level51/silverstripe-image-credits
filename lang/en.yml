@@ -5,7 +5,11 @@ en:
     BottomRight: Bottom Right
     Credits: Credits
   Level51\ImageCredits\SettingsFormField:
+    BoxBackgroundColor: Background color
+    BoxBackgroundColorDesc: 'as HEX value (e.g. #ffffff for white) with optional alpha value (e.g. #ffffffcc for 80% opacity)'
     BoxPadding: Background box padding
+    FontColor: Font Color
+    FontColorDesc: 'Color of the font as HEX value (e.g. #ffffff for white)'
     FontSize: Font Size
     Position: Position
     TextMargin: Text Margin

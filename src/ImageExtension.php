@@ -82,6 +82,29 @@ class ImageExtension extends DataExtension
         ];
     }
 
+    private function hexToRGBA(string $hex): string|null
+    {
+        $hex = str_replace('#', '', $hex);
+
+        if (strlen($hex) === 6 || strlen($hex) === 8) {
+            $opacity = 1;
+
+            if (strlen($hex) === 8) {
+                $opacity = round(hexdec($hex[6] . $hex[7]) / 255, 2);
+            }
+
+            return sprintf(
+                'rgba(%s, %s, %s, %s)',
+                hexdec($hex[0] . $hex[1]),
+                hexdec($hex[2] . $hex[3]),
+                hexdec($hex[4] . $hex[5]),
+                $opacity
+            );
+        }
+
+        return null;
+    }
+
     private function getPositionOption(array|null $creditsSettings): string
     {
         $options = self::getPositionOptions();
@@ -97,6 +120,39 @@ class ImageExtension extends DataExtension
         }
 
         return self::POSITION_BOTTOM_RIGHT;
+    }
+
+    private function getFontColor(array|null $creditsSettings): string
+    {
+        if (
+            $creditsSettings &&
+            isset($creditsSettings['FontColor']) &&
+            is_string($creditsSettings['FontColor']) &&
+            strlen($creditsSettings['FontColor']) === 7 &&
+            str_starts_with($creditsSettings['FontColor'], '#')
+        ) {
+            return $creditsSettings['FontColor'];
+        }
+
+        return Config::inst()->get(__CLASS__, 'font_color');
+    }
+
+    private function getBackgroundColor(array|null $creditsSettings): string
+    {
+        if (
+            $creditsSettings &&
+            isset($creditsSettings['BoxBackgroundColor']) &&
+            is_string($creditsSettings['BoxBackgroundColor']) &&
+            (
+                strlen($creditsSettings['BoxBackgroundColor']) === 7 ||
+                strlen($creditsSettings['BoxBackgroundColor']) === 9
+            ) &&
+            str_starts_with($creditsSettings['BoxBackgroundColor'], '#')
+        ) {
+            return $creditsSettings['BoxBackgroundColor'];
+        }
+
+        return Config::inst()->get(__CLASS__, 'box_background');
     }
 
     private function getParsedCreditsSettings(): ?array
@@ -126,8 +182,8 @@ class ImageExtension extends DataExtension
             'boxPadding'    => $creditsSettings['BoxPadding'] ?? $config->get('box_padding'),
             'fontPath'      => $fontPath,
             'fontSize'      => $creditsSettings['FontSize'] ?? $config->get('font_size'),
-            'fontColor'     => $config->get('font_color'),
-            'boxBackground' => $config->get('box_background'),
+            'fontColor'     => $this->getFontColor($creditsSettings),
+            'boxBackground' => $this->getBackgroundColor($creditsSettings),
             'position'      => $this->getPositionOption($creditsSettings),
         ];
     }
@@ -236,7 +292,9 @@ class ImageExtension extends DataExtension
                                 $positions['box']['x2'],
                                 $positions['box']['y2'],
                                 function ($draw) use ($settings) {
-                                    $draw->background($settings['boxBackground']);
+                                    if ($color = $this->hexToRGBA($settings['boxBackground'])) {
+                                        $draw->background($color);
+                                    }
                                 },
                             );
                         }

@@ -5,7 +5,11 @@ de:
     BottomRight: Unten rechts
     Credits: Bildrechte
   Level51\ImageCredits\SettingsFormField:
+    BoxBackgroundColor: Hintergrundfarbe
+    BoxBackgroundColorDesc: 'als HEX Wert (z.B. #ffffff für weiß) mit optionalem Alpha Wert (z.B. #ffffffcc für 80% Deckkraft)'
     BoxPadding: Hintergrund Abstand zum Text
+    FontColor: Schriftfarbe
+    FontColorDesc: 'als HEX Wert (z.B. #ffffff für weiß)'
     FontSize: Schriftgröße
     Position: Position
     TextMargin: Text Abstand zu den Rändern des Bildes

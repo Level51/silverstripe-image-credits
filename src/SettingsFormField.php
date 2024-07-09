@@ -6,6 +6,7 @@ use SilverStripe\Forms\CompositeField;
 use SilverStripe\Forms\DropdownField;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Forms\NumericField;
+use SilverStripe\Forms\TextField;
 
 class SettingsFormField extends CompositeField
 {
@@ -30,10 +31,16 @@ class SettingsFormField extends CompositeField
                     _t(__CLASS__ . '.Position', 'Position'),
                     ImageExtension::getPositionOptions(),
                 )->setHasEmptyDefault(true),
+                TextField::create(
+                    'FontColor',
+                    _t(__CLASS__ . '.FontColor', 'Font Color'),
+                )->setDescription(_t(__CLASS__ . '.FontColorDesc', 'Color of the font as HEX value (e.g. #ffffff for white)')),
+                TextField::create(
+                    'BoxBackgroundColor',
+                    _t(__CLASS__ . '.BoxBackgroundColor', 'Box background color'),
+                )->setDescription(_t(__CLASS__ . '.BoxBackgroundColorDesc', 'Color of the font as HEX value (e.g. #ffffff for white)')),
             ],
         );
-
-        // TODO add color picker for font and box background color
 
         parent::__construct($children);
 
